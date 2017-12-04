@@ -49,6 +49,9 @@ loop:
 			c.stats.Update(logEntries)
 			select {
 			case onAlert = <-warn:
+				if !onAlert {
+					log.Println("RECOVERED")
+				}
 				view.Display(c.stats, onAlert)
 			default:
 				view.Display(c.stats, onAlert)
