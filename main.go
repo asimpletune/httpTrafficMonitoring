@@ -41,7 +41,6 @@ func parseArgs() (filePath string, interval int) {
 	var err error
 	if arguments, err := docopt.Parse(usage, nil, true, version, false); err == nil {
 		if timeString, _ := arguments["--time"]; timeString != nil {
-			fmt.Println(arguments)
 			if timeSeconds, err := strconv.Atoi(timeString.(string)); err == nil {
 				if timeSeconds <= 0 {
 					timeSeconds = defaultInterval

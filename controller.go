@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"github.com/olekukonko/tablewriter"
 )
 
 type Controller struct {
@@ -27,7 +28,8 @@ func NewController(filePath string, timeInSeconds int) *Controller {
 }
 
 func (c *Controller) Monitor(quit chan int, done chan int) {
-	log.Println("beginning monitoring")
+	log.Println("Beginning monitoring")
+	table := tablewriter.NewWriter(os.Stdout)
 loop:
 	for {
 		select {
@@ -35,9 +37,10 @@ loop:
 			log.Println("received quit signal")
 			break loop
 		case <-time.After(c.interval):
-			log.Println("Interval")
+			log.Println("Getting updates...")
 			logEntries := c.monitor.GetUpdates(c.file)
-			c.stats.update(logEntries)
+			c.stats.Update(logEntries)
+			c.stats.Display(table)
 		}
 	}
 	log.Println("sending done signal")
