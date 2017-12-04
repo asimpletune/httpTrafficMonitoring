@@ -11,7 +11,10 @@ func main() {
 	done := make(chan int)
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt)
-	go monitor(quit, done)
+
+	controller := NewController("/Users/Spencer/Desktop/server/access.log", 3)
+	go controller.Monitor(quit, done)
+
 	for range signalChan {
 		fmt.Println("sending quit signal")
 		quit <- 1
@@ -20,19 +23,4 @@ func main() {
 		fmt.Println("done")
 		break
 	}
-}
-
-func monitor(quit chan int, done chan int) {
-	fmt.Println("beginning monitoring")
-	loop:
-	for {
-		select {
-		case <- quit:
-			fmt.Println("received quit signal")
-			break loop
-		default:
-		}
-	}
-	fmt.Println("sending done signal")
-	done <- 1
 }
