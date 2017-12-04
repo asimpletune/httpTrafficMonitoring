@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	filePath, interval := parseArgs()
-	quit, done := beginMonitoring(NewController(filePath, interval))
+	filePath, interval, alertThreshold := parseArgs()
+	quit, done := beginMonitoring(NewController(filePath, interval, alertThreshold))
 	handleSignals(quit, done)
 }
 
@@ -37,32 +37,39 @@ func beginMonitoring(controller *Controller) (quit chan int, done chan int) {
 	return q, d
 }
 
-func parseArgs() (filePath string, interval int) {
+func parseArgs() (filePath string, interval int, alertThreshold int) {
 	var err error
 	if arguments, err := docopt.Parse(usage, nil, true, version, false); err == nil {
-		if timeString, _ := arguments["--time"]; timeString != nil {
-			if timeSeconds, err := strconv.Atoi(timeString.(string)); err == nil {
-				if timeSeconds <= 0 {
-					timeSeconds = defaultInterval
-				}
-				return arguments["<file>"].(string), timeSeconds
+		timeSeconds := defaultMonitoringInterval
+		if arguments["--time"] != nil {
+			proposed, _ := strconv.Atoi(arguments["--time"].(string))
+			if proposed > 0 {
+				timeSeconds = proposed
 			}
-		} else {
-			return arguments["<file>"].(string), defaultInterval
 		}
+		alertThreshold := defaultHitCountToStartAlerting
+		if arguments["--alert"] != nil {
+			proposed, _ := strconv.Atoi(arguments["--alert"].(string))
+			if proposed >= 0 {
+				alertThreshold = proposed
+			}
+		}
+		return arguments["<file>"].(string), timeSeconds, alertThreshold
 	}
 	log.Fatal(err)
 	return
 }
 
 const version = "HTTP Log Monitoring Console Program 0.1"
-const defaultInterval = 10
+const defaultMonitoringInterval = 10
+const defaultHitCountToStartAlerting = 100
 const usage = `HTTP Log Monitoring Console Program.
 
 Usage:
-  monitor [--time=10] <file>
+  monitor [--time=10] [--alert=100.0] <file>
 
 Options:
   -h --help     		Show this screen.
   --version     		Show version.
-  -t --time=<seconds>	Time to refresh log stats in seconds [default: 10].`
+  -t --time=<seconds>	Time to refresh log stats in seconds [default: 10].
+  --alert=<hits/second> Threshold to generate an alert that will persist until traffic falls below for two minutes.`

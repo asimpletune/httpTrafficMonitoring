@@ -3,17 +3,16 @@ package main
 import (
 	"net/url"
 	"strings"
-	"github.com/olekukonko/tablewriter"
-	"strconv"
-	"fmt"
 )
 
 type SiteStats struct {
+	Hits    int
 	Section map[string]SectionStats
 }
 
 func NewSiteStats() *SiteStats {
 	return &SiteStats{
+		0,
 		make(map[string]SectionStats)}
 }
 
@@ -22,23 +21,10 @@ type SectionStats struct {
 	StatusCode map[int]int
 }
 
-func (stats *SiteStats) Display(table *tablewriter.Table) {
-	// Section stats
-	table.SetHeader([]string{"Section", "Hits", "Status Code"})
-	for key := range stats.Section {
-		value, _ := stats.Section[key]
-		statusCodes := ""
-		for code := range value.StatusCode {
-			statusCodes += fmt.Sprintf("%d: %d, ", code,  value.StatusCode[code])
-		}
-		table.Append([]string{key, strconv.Itoa(value.Hits), statusCodes[:len(statusCodes)-2]}) // remove trailing ","
-	}
-	table.Render()
-	table.ClearRows()
-}
-
 func (stats *SiteStats) Update(logEntries []*CommonLogEntry) {
 	for _, entry := range logEntries {
+		// Overall hit stats
+		stats.Hits++
 		// Section stats
 		stats.updateSectionStats(entry)
 	}
