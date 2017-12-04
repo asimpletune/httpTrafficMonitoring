@@ -9,11 +9,17 @@ import (
 type Controller struct {
 	file     *os.File
 	interval time.Duration
+	monitor  Monitor
+	stats    *SiteStats
 }
 
 func NewController(filePath string, timeInSeconds int) *Controller {
 	if file, err := os.Open(filePath); err == nil {
-		return &Controller{file: file, interval: time.Duration(timeInSeconds) * time.Second}
+		return &Controller{
+			file:     file,
+			interval: time.Duration(timeInSeconds) * time.Second,
+			monitor:  Monitor{},
+			stats:    NewSiteStats()}
 	} else {
 		log.Fatal(err)
 		return nil
@@ -30,10 +36,10 @@ loop:
 			break loop
 		case <-time.After(c.interval):
 			log.Println("Interval")
+			logEntries := c.monitor.GetUpdates(c.file)
+			c.stats.update(logEntries)
 		}
 	}
 	log.Println("sending done signal")
 	done <- 1
 }
-
-

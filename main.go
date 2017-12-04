@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
 	"github.com/docopt/docopt-go"
 	"log"
+	"os"
+	"os/signal"
 	"strconv"
 )
 
@@ -22,7 +22,7 @@ func handleSignals(quit chan int, done chan int) {
 		fmt.Println("sending quit signal")
 		quit <- 1
 		fmt.Println("waiting for monitoring to be done")
-		<- done
+		<-done
 		fmt.Println("done")
 		break
 	}
@@ -39,11 +39,11 @@ func beginMonitoring(controller *Controller) (quit chan int, done chan int) {
 
 func parseArgs() (filePath string, interval int) {
 	var err error
-	if arguments, err := docopt.Parse(usage, nil, true,  version, false); err == nil {
+	if arguments, err := docopt.Parse(usage, nil, true, version, false); err == nil {
 		if timeString, _ := arguments["--time"]; timeString != nil {
 			fmt.Println(arguments)
 			if timeSeconds, err := strconv.Atoi(timeString.(string)); err == nil {
-				if  timeSeconds <= 0 {
+				if timeSeconds <= 0 {
 					timeSeconds = defaultInterval
 				}
 				return arguments["<file>"].(string), timeSeconds
@@ -67,4 +67,3 @@ Options:
   -h --help     		Show this screen.
   --version     		Show version.
   -t --time=<seconds>	Time to refresh log stats in seconds [default: 10].`
-
