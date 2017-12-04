@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type CommonLogEntry struct {
@@ -11,7 +12,7 @@ type CommonLogEntry struct {
 	UserId           string
 	Date             string
 	Request          *http.Request
-	StatusCode       string
+	StatusCode       int
 	ReturnObjectSize string
 }
 
@@ -24,13 +25,17 @@ func NewLogEntryFrom(byteArray [][]byte) *CommonLogEntry {
 		log.Fatal(err)
 	}
 	request.Proto = protocol
+	statusCode, err := strconv.Atoi(string(byteArray[8]))
+	if err != nil {
+		log.Fatal(err)
+	}
 	return &CommonLogEntry{
 		string(byteArray[0]),
 		string(byteArray[1]),
 		string(byteArray[2]),
 		string(byteArray[3]) + string(byteArray[4]),
 		request,
-		string(byteArray[8]),
+		statusCode,
 		string(byteArray[9]),
 	}
 }
