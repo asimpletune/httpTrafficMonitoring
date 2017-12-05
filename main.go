@@ -66,7 +66,7 @@ const defaultHitCountToStartAlerting = 100
 const usage = `HTTP Log Monitoring Console Program.
 
 Usage:
-  monitor [--time=10] [--alert=100.0] <file>
+  httpTrafficMonitoring [--time=10] [--alert=100.0] <file>
 
 Options:
   -h --help     		Show this screen.

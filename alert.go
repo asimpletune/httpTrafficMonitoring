@@ -18,7 +18,7 @@ func NewAlert(threshold float64, interval time.Duration, stats *SiteStats) *Aler
 		Threshold:       threshold,
 		CheckInterval:   interval,
 		CoolOffInterval: defaultCoolOffInterval,
-		Stats:           stats,}
+		Stats:           stats}
 }
 
 func (a *Alert) Monitor(warn chan bool) {
@@ -26,7 +26,7 @@ func (a *Alert) Monitor(warn chan bool) {
 	for {
 		select {
 		case <-time.After(a.CheckInterval):
-			if !a.ok(previousHitCount, a.CheckInterval){
+			if !a.ok(previousHitCount, a.CheckInterval) {
 				warn <- true
 				a.coolOff(a.Stats.Hits)
 				warn <- false
