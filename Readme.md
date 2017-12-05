@@ -11,6 +11,16 @@ Options:
   --alert=<hits/second> Threshold to generate an alert that will persist until traffic falls below for two minutes.`
 ```
 
+## Installing/Running
+
+Golang is a "fat binary" paradigm, so you can run the program by cd'ing into the project directory and then executing the binary, i.e.
+
+```
+./httpTrafficMonitoring --help
+```
+
+Otherwise, it can be installed by installing go, setting up your GOPATH, and then running `go install`. The executable will be present in `$GOPATH/bin/`.
+
 ## Discussion
 
 This is a CLI app written in golang, and it's intended to consume an actively written log in the Common Log Format and print some stats to the screen.
